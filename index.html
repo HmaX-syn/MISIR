@@ -1,135 +1,89 @@
+<!-- *:HmaX:* -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Haşlanmış Mısır Tarifi - HmaX</title>
+    <title>Base64 to MP4 Converter</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
         body {
-            background-color: #f7f9fc;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            font-family: sans-serif;
+            background: #121212;
+            color: #eee;
+            max-width: 600px;
+            margin: 40px auto;
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
-        .recipe-card {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            max-width: 500px;
+        textarea {
             width: 100%;
-            overflow: hidden;
-            border: 1px solid #eef2f5;
+            height: 150px;
+            background: #1e1e1e;
+            color: #0ff;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+            resize: vertical;
         }
-        .card-header {
-            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-            color: #fff;
-            padding: 30px 20px;
-            text-align: center;
-        }
-        .card-header h1 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .card-header p {
-            font-size: 0.95rem;
-            opacity: 0.9;
-        }
-        .card-body {
-            padding: 25px 30px;
-        }
-        .section-title {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #f6d365;
-            display: inline-block;
-            padding-bottom: 4px;
-        }
-        .steps {
-            list-style: none;
-            counter-reset: step-counter;
-        }
-        .steps li {
-            counter-increment: step-counter;
-            position: relative;
-            padding-left: 45px;
-            margin-bottom: 20px;
-            color: #555;
-            line-height: 1.5;
-        }
-        .steps li::before {
-            content: counter(step-counter);
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 30px;
-            height: 30px;
-            background-color: #fda085;
+        button {
+            background: #00adb5;
             color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 4px;
             font-weight: bold;
-            font-size: 0.9rem;
+            margin-top: 10px;
+            width: 100%;
         }
-        .video-container {
-            margin-top: 25px;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        button:hover {
+            background: #00818a;
         }
         video {
+            margin-top: 20px;
             width: 100%;
-            display: block;
-        }
-        .card-footer {
-            background-color: #fafbfc;
-            padding: 15px 30px;
-            text-align: center;
-            font-size: 0.85rem;
-            color: #888;
-            border-top: 1px solid #eef2f5;
+            border-radius: 4px;
+            background: #000;
         }
     </style>
 </head>
 <body>
 
-    <div class="recipe-card">
-        <div class="card-header">
-            <h1>Lezzetli Haşlanmış Mısır</h1>
-            <p>Pratik ve Adım Adım Hazırlanışı</p>
-        </div>
-        
-        <div class="card-body">
-            <h2 class="section-title">Hazırlanış Adımları</h2>
-            <ol class="steps">
-                <li>Mısırları tencereye yerleştirip iyice haşlayın.</li>
-                <li>Haşlanan mısırlara damak tadınıza göre tuz ekleyin.</li>
-                <li>Mısırı tabağa servis edip afiyetle yiyin!</li>
-            </ol>
+    <h2>Base64 - MP4 Oynatıcı ve Dönüştürücü</h2>
+    <p>Base64 verisini aşağıdaki alana yapıştır:</p>
+    
+    <textarea id="base64Input" placeholder="Base64 metnini buraya yapıştır..."></textarea>
+    <br>
+    <button onclick="convertAndPlay()">Videoya Çevir & Oynat</button>
+    
+    <video id="videoPlayer" controls></video>
 
-            <div class="video-container">
-                <video controls playsinline preload="metadata">
-                    <source src="MISIRCI.mp4" type="video/mp4">
-                    Tarif videosu yüklenemedi.
-                </video>
-            </div>
-        </div>
-
-        <div class="card-footer">
-            Tarif & Sunum: *:HmaX:*
-        </div>
-    </div>
+    <script>
+        function convertAndPlay() {
+            const b64 = document.getElementById('base64Input').value.trim();
+            if (!b64) {
+                alert('Lütfen geçerli bir Base64 metni gir!');
+                return;
+            }
+            try {
+                const byteCharacters = atob(b64);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'video/mp4' });
+                const videoUrl = URL.createObjectURL(blob);
+                
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.src = videoUrl;
+                videoPlayer.play();
+            } catch (e) {
+                alert('Hata: Geçersiz Base64 formatı! ' + e.message);
+            }
+        }
+    </script>
 
 </body>
 </html>
